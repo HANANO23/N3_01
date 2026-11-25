@@ -441,6 +441,7 @@
       border-radius: 14px;
       padding: 18px 18px 16px;
       margin-bottom: 16px;
+      text-align: center;
     }
 
     .prompt-jp {
@@ -449,6 +450,7 @@
       line-height: 1.68;
       margin-bottom: 10px;
       color: var(--text);
+      text-align: center;
     }
 
     .prompt-kr {
@@ -457,6 +459,7 @@
       color: var(--text);
       padding-top: 10px;
       border-top: 1px dashed var(--border-strong);
+      text-align: center;
     }
 
     .prompt-sub {
@@ -553,6 +556,30 @@
       font-size: 1.05rem;
       font-weight: 800;
       margin-bottom: 5px;
+    }
+
+
+    .diff-bad {
+      color: var(--danger);
+      background: var(--danger-bg);
+      border: 1px solid var(--danger-border);
+      border-radius: 4px;
+      padding: 1px 4px;
+      margin: 0 1px;
+      font-weight: 800;
+    }
+    .diff-gap {
+      display: inline-block;
+      font-size: 0.78em;
+      line-height: 1.35;
+      vertical-align: baseline;
+      margin: 0 2px;
+      padding: 1px 5px;
+      color: var(--warn);
+      background: var(--warn-bg);
+      border: 1px solid var(--warn-border);
+      border-radius: 4px;
+      font-weight: 800;
     }
 
     .compare-line {
@@ -912,88 +939,6 @@
     .hidden {
       display: none !important;
     }
-  
-    .q-header {
-      justify-content: center;
-      text-align: center;
-    }
-    .prompt-box {
-      text-align: center;
-    }
-    .prompt-jp,
-    .prompt-kr,
-    .prompt-sub {
-      text-align: center;
-    }
-    .quick-marks {
-      justify-content: center;
-    }
-    .action-bar {
-      justify-content: center;
-    }
-    .nav-bar {
-      justify-content: center;
-    }
-    .shortcut-note {
-      text-align: center;
-    }
-    .auto-nav-bar {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 10px;
-      padding: 10px 14px;
-      border-radius: var(--radius-sm);
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--muted);
-    }
-    .auto-nav-toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      color: var(--text);
-      font-weight: 800;
-      user-select: none;
-    }
-    .auto-nav-toggle input[type="checkbox"] {
-      width: 17px;
-      height: 17px;
-      accent-color: var(--primary);
-      cursor: pointer;
-    }
-    .auto-nav-delay {
-      width: auto;
-      min-height: 36px;
-      padding: 5px 10px;
-      font-size: 0.83rem;
-      font-weight: 700;
-    }
-    .full-review-banner {
-      background: linear-gradient(135deg, var(--primary-soft), var(--accent-vermilion-soft));
-      border: 1.5px solid var(--primary);
-      border-radius: 14px;
-      padding: 16px 18px;
-      margin-bottom: 14px;
-      text-align: center;
-    }
-    .full-review-banner h2 {
-      margin: 0 0 6px;
-      font-size: 1.15rem;
-      font-weight: 800;
-      color: var(--primary);
-    }
-    .full-review-banner p {
-      margin: 0 0 12px;
-      font-size: 0.9rem;
-      color: var(--text);
-    }
-
   </style>
 </head>
 <body>
@@ -1023,8 +968,8 @@
           <span class="lbl">정답</span>
           <span class="val" id="statOk" style="color:var(--success)">0</span>
         </div>
-        <div class="stat-card">
-          <span class="lbl">오답 복습 대상</span>
+        <div class="stat-card" id="wrongStatCard" style="cursor:pointer;" title="클릭하여 오답 총 복습 시작">
+          <span class="lbl">오답 복습 대상 (클릭)</span>
           <span class="val" id="statBad" style="color:var(--danger)">0</span>
         </div>
         <div class="stat-card">
@@ -1043,8 +988,7 @@
           <option value="001-050">001 ~ 050 문법</option>
           <option value="051-103">051 ~ 103 문법</option>
           <option value="104-137">104 ~ 137 문법</option>
-          <option value="wrong">현재 오답 복습 모드</option>
-          <option value="history_wrong">오답 이력 총복습 모드</option>
+          <option value="wrong">오답 복습 모드</option>
           <option value="unsolved">미학습 문항만</option>
         </select>
 
@@ -1100,30 +1044,6 @@
         <button type="button" class="btn-primary" id="gradeBtn">발음 채점 및 해설 보기</button>
         <button type="button" class="btn-secondary" id="revealBtn">정답 · 해설 바로 보기</button>
         <button type="button" class="btn-secondary" id="clearBtn">입력 지우기</button>
-      </div>
-
-      <div class="auto-nav-bar" id="autoNavBar">
-        <label class="auto-nav-toggle" for="autoAdvanceToggle">
-          <input type="checkbox" id="autoAdvanceToggle" />
-          <span>정답 시 다음 문항 자동 이동</span>
-        </label>
-        <select id="autoAdvanceDelay" class="auto-nav-delay" aria-label="자동 이동 대기 시간">
-          <option value="800">0.8초 후 이동</option>
-          <option value="1200" selected>1.2초 후 이동</option>
-          <option value="1800">1.8초 후 이동</option>
-          <option value="2500">2.5초 후 이동</option>
-        </select>
-        <button type="button" class="btn-secondary btn-sm" id="historyReviewBtn">오답 이력 총복습 (0)</button>
-        <span id="autoNavCountdown" style="color:var(--primary);"></span>
-      </div>
-
-      <div id="fullSweepCompletionBox" class="full-review-banner hidden" aria-live="polite">
-        <h2 id="sweepTitle">전범위 학습 완료!</h2>
-        <p id="sweepDesc"></p>
-        <div class="btn-row" style="justify-content:center;">
-          <button type="button" class="btn-primary btn-sm" id="startHistoryReviewBtn">오답 이력 총복습 시작</button>
-          <button type="button" class="btn-secondary btn-sm" id="dismissSweepBtn">현재 화면 유지</button>
-        </div>
       </div>
 
       <section id="resultBox" class="result-box hidden" aria-live="polite">
@@ -2176,7 +2096,7 @@
 정부는 채소에 대한 농약 규제를 강화했다.
 
 ・姉はおとなしい性格なのに対して、妹は活発だ。
-(아네와 오토나시- 세-가쿠나노니 타이시테, 이모-토와 캇파츠다)
+(아네와 오토나시- 세-카쿠나노니 타이시테, 이모-토와 캇파츠다)
 언니는 얌전한 성격인 데 반해, 여동생은 활발하다.
 
 
@@ -4984,6 +4904,112 @@
 
     const ALL_CARDS = parseGrammarList(RAW_GRAMMAR_TEXT);
 
+
+    function highlightPronDiff(refStr, userStr) {
+      const ref = (refStr || "").trim();
+      const user = (userStr || "").trim();
+      if (!user) return "(미입력)";
+      if (!ref) return escapeHtml(user);
+
+      // 공백/기호를 제외한 핵심 문자 배열 추출
+      const isIgnorable = (ch) => /[\s\u00A0·ㆍ・,，.。!?！？"'()（）「」『』〜～ー\-]/.test(ch);
+      const refTokens = [];
+      for (let i = 0; i < ref.length; i++) {
+        if (!isIgnorable(ref[i])) refTokens.push(ref[i].toLowerCase());
+      }
+      const userTokens = [];
+      for (let i = 0; i < user.length; i++) {
+        if (!isIgnorable(user[i])) userTokens.push({ ch: user[i].toLowerCase(), origIdx: i });
+      }
+
+      const n = refTokens.length;
+      const m = userTokens.length;
+      const dp = Array.from({ length: n + 1 }, () => new Uint16Array(m + 1));
+
+      for (let i = n - 1; i >= 0; i--) {
+        for (let j = m - 1; j >= 0; j--) {
+          if (refTokens[i] === userTokens[j].ch) {
+            dp[i][j] = 1 + dp[i + 1][j + 1];
+          } else {
+            dp[i][j] = dp[i + 1][j] >= dp[i][j + 1] ? dp[i + 1][j] : dp[i][j + 1];
+          }
+        }
+      }
+
+      // LCS 역추적:
+      // - 1대1 정렬 기준:
+      //   * ref와 user가 맞물려 치환된 위치(i < n && j < m 이면서 dp[i+1][j] === dp[i][j+1]) -> 오답('하이라이트')
+      //   * ref에만 있고 user에 없는 글자(dp[i+1][j] > dp[i][j+1] 또는 끝부분 잔여 ref) -> 누락('[누락]')
+      //   * user에만 더 적힌 글자(dp[i][j+1] > dp[i+1][j]) -> 오답('하이라이트')
+      const matchedUserTokenIdx = new Set();
+      const mismatchUserTokenIdx = new Set();
+      const gapBeforeUserToken = new Set();
+      let i = 0, j = 0;
+      while (i < n && j < m) {
+        if (refTokens[i] === userTokens[j].ch) {
+          matchedUserTokenIdx.add(j);
+          i++;
+          j++;
+        } else if (dp[i + 1][j] === dp[i][j + 1]) {
+          // 오답(틀린 내용): 하이라이트 처리
+          mismatchUserTokenIdx.add(j);
+          i++;
+          j++;
+        } else if (dp[i + 1][j] > dp[i][j + 1]) {
+          // 누락: [누락] 처리
+          gapBeforeUserToken.add(j);
+          i++;
+        } else {
+          // 여분 오답 글자: 하이라이트 처리
+          mismatchUserTokenIdx.add(j);
+          j++;
+        }
+      }
+      while (i < n) {
+        gapBeforeUserToken.add(m);
+        i++;
+      }
+      while (j < m) {
+        mismatchUserTokenIdx.add(j);
+        j++;
+      }
+
+      const gapBadge = `<span class="diff-gap" aria-label="글자 누락 위치">[누락]</span>`;
+
+      let out = "";
+      let uTokPtr = 0;
+      for (let idx = 0; idx < user.length; idx++) {
+        const rawCh = user[idx];
+        if (isIgnorable(rawCh)) {
+          out += escapeHtml(rawCh);
+          continue;
+        }
+        if (gapBeforeUserToken.has(uTokPtr)) {
+          out += gapBadge;
+        }
+        if (matchedUserTokenIdx.has(uTokPtr)) {
+          out += escapeHtml(rawCh);
+        } else if (mismatchUserTokenIdx.has(uTokPtr)) {
+          out += `<span class="diff-bad">${escapeHtml(rawCh)}</span>`;
+        } else {
+          out += escapeHtml(rawCh);
+        }
+        uTokPtr++;
+      }
+      if (gapBeforeUserToken.has(m)) {
+        out += gapBadge;
+      }
+      return out;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
     function normalizePron(str) {
       return (str || "")
         .toLowerCase()
@@ -5164,74 +5190,22 @@
         scope: "all",
         search: "",
         currentUid: ALL_CARDS[0] ? ALL_CARDS[0].uid : "",
-        records: {},
-        wrongHistory: {},
-        autoAdvance: true,
-        autoAdvanceDelay: 1200,
-        sweepCompleted: false
+        records: {}
       };
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return fallback;
         const parsed = JSON.parse(raw);
-        const records = parsed.records && typeof parsed.records === "object" ? parsed.records : {};
-        const wrongHistory = parsed.wrongHistory && typeof parsed.wrongHistory === "object" ? { ...parsed.wrongHistory } : {};
-        for (const [uid, rec] of Object.entries(records)) {
-          if (rec && rec.status === "wrong") {
-            wrongHistory[uid] = {
-              count: (wrongHistory[uid]?.count || 0) || 1,
-              lastWrongAt: wrongHistory[uid]?.lastWrongAt || rec.updatedAt || Date.now(),
-              cleared: false
-            };
-          }
-        }
         return {
           theme: parsed.theme === "dark" ? "dark" : "light",
           scope: parsed.scope || "all",
           search: typeof parsed.search === "string" ? parsed.search : "",
           currentUid: parsed.currentUid || fallback.currentUid,
-          records,
-          wrongHistory,
-          autoAdvance: typeof parsed.autoAdvance === "boolean" ? parsed.autoAdvance : true,
-          autoAdvanceDelay: [800, 1200, 1800, 2500].includes(Number(parsed.autoAdvanceDelay)) ? Number(parsed.autoAdvanceDelay) : 1200,
-          sweepCompleted: Boolean(parsed.sweepCompleted)
+          records: parsed.records && typeof parsed.records === "object" ? parsed.records : {}
         };
       } catch (e) {
         return fallback;
       }
-    }
-
-    let autoAdvanceTimer = null;
-    let autoAdvanceInterval = null;
-
-    function clearAutoAdvanceTimer() {
-      if (autoAdvanceTimer) {
-        clearTimeout(autoAdvanceTimer);
-        autoAdvanceTimer = null;
-      }
-      if (autoAdvanceInterval) {
-        clearInterval(autoAdvanceInterval);
-        autoAdvanceInterval = null;
-      }
-      const cd = document.getElementById("autoNavCountdown");
-      if (cd) cd.textContent = "";
-    }
-
-    function recordWrongHistory(uid) {
-      const prev = state.wrongHistory[uid] || { count: 0, lastWrongAt: 0, cleared: false };
-      state.wrongHistory[uid] = {
-        count: (prev.count || 0) + 1,
-        lastWrongAt: Date.now(),
-        cleared: false
-      };
-    }
-
-    function getHistoryWrongCards() {
-      return ALL_CARDS.filter((c) => {
-        const h = state.wrongHistory[c.uid];
-        const r = state.records[c.uid];
-        return Boolean((h && (h.count > 0 || !h.cleared)) || (r && r.status === "wrong"));
-      });
     }
 
     let state = loadState();
@@ -5261,12 +5235,10 @@
       const q = (state.search || "").trim().toLowerCase();
       return ALL_CARDS.filter((c) => {
         const rec = state.records[c.uid];
-        const hist = state.wrongHistory[c.uid];
         if (state.scope === "001-050" && (c.num < 1 || c.num > 50)) return false;
         if (state.scope === "051-103" && (c.num < 51 || c.num > 103)) return false;
         if (state.scope === "104-137" && (c.num < 104 || c.num > 137)) return false;
         if (state.scope === "wrong" && (!rec || rec.status !== "wrong")) return false;
-        if (state.scope === "history_wrong" && !((hist && (hist.count > 0 || !hist.cleared)) || (rec && rec.status === "wrong"))) return false;
         if (state.scope === "unsolved" && rec && rec.status) return false;
 
         if (!q) return true;
@@ -5297,47 +5269,11 @@
       }
 
       const scoped = getScopedCards();
-      const histWrongCount = getHistoryWrongCards().length;
       document.getElementById("statDone").textContent = `${done} / ${totalAll}`;
       document.getElementById("statOk").textContent = `${ok}`;
       document.getElementById("statBad").textContent = `${bad}`;
       document.getElementById("statScope").textContent = `${scoped.length}개`;
       document.getElementById("progressFill").style.width = `${totalAll ? Math.round((done / totalAll) * 100) : 0}%`;
-      const histBtn = document.getElementById("historyReviewBtn");
-      if (histBtn) histBtn.textContent = `오답 이력 총복습 (${histWrongCount})`;
-    }
-
-    function checkFullSweepCompletion() {
-      const totalAll = ALL_CARDS.length;
-      if (!totalAll) return;
-      let done = 0;
-      for (const c of ALL_CARDS) {
-        if (state.records[c.uid]?.status) done += 1;
-      }
-      const banner = document.getElementById("fullSweepCompletionBox");
-      if (!banner) return;
-
-      if (done === totalAll && state.scope !== "history_wrong") {
-        const histCards = getHistoryWrongCards();
-        document.getElementById("sweepTitle").textContent = "전범위(001~137 전체 예문) 1회독 완료!";
-        if (histCards.length > 0) {
-          document.getElementById("sweepDesc").textContent =
-            `총 ${totalAll}문항을 모두 학습했습니다. 누적 오답 이력 ${histCards.length}개 문항을 모아 총복습을 시작할 수 있습니다.`;
-          document.getElementById("startHistoryReviewBtn").classList.remove("hidden");
-        } else {
-          document.getElementById("sweepDesc").textContent =
-            `총 ${totalAll}문항을 모두 완료했으며 누적 오답 이력이 없습니다! 언제든 원하는 범위나 오답 이력 모드로 복습해 보세요.`;
-          document.getElementById("startHistoryReviewBtn").classList.add("hidden");
-        }
-        if (!state.sweepCompleted) {
-          state.sweepCompleted = true;
-          saveState();
-          banner.classList.remove("hidden");
-        }
-      } else if (done < totalAll) {
-        state.sweepCompleted = false;
-        banner.classList.add("hidden");
-      }
     }
 
     function rebuildQuestionSelect(list, cur) {
@@ -5355,12 +5291,6 @@
     }
 
     function renderCard() {
-      clearAutoAdvanceTimer();
-      document.getElementById("scopeSelect").value = state.scope;
-      const autoToggle = document.getElementById("autoAdvanceToggle");
-      const autoDelay = document.getElementById("autoAdvanceDelay");
-      if (autoToggle) autoToggle.checked = Boolean(state.autoAdvance);
-      if (autoDelay) autoDelay.value = String(state.autoAdvanceDelay || 1200);
       updateHeaderStats();
       const list = getScopedCards();
       const cur = getCurrentCard();
@@ -5410,26 +5340,17 @@
       promptJp.textContent = cur.jp;
       promptKr.textContent = `(${cur.kr})`;
       promptHint.textContent = `핵심 문법 의미: ${cur.meaning}`;
-      inputEl.value = rec?.userInput || "";
+      inputEl.value = state.scope === "wrong" ? "" : (rec?.userInput || "");
     }
 
-    function setCardStatus(uid, status, userInput, options = {}) {
+    function setCardStatus(uid, status, userInput) {
       state.records[uid] = {
         status,
         userInput: typeof userInput === "string" ? userInput : (state.records[uid]?.userInput || ""),
         updatedAt: Date.now()
       };
-      if (status === "wrong") {
-        recordWrongHistory(uid);
-      } else if (status === "correct" && state.wrongHistory[uid]) {
-        state.wrongHistory[uid] = {
-          ...state.wrongHistory[uid],
-          cleared: true
-        };
-      }
       saveState();
       updateHeaderStats();
-      checkFullSweepCompletion();
       const cur = getCurrentCard();
       if (cur) rebuildQuestionSelect(getScopedCards(), cur);
 
@@ -5437,46 +5358,10 @@
       if (status === "correct") {
         badge.textContent = "정답 완료";
         badge.className = "status-pill ok";
-        if (options.triggerAutoAdvance && state.autoAdvance) {
-          scheduleAutoAdvance(uid);
-        }
       } else if (status === "wrong") {
-        clearAutoAdvanceTimer();
         badge.textContent = "오답 복습";
         badge.className = "status-pill bad";
       }
-    }
-
-    function scheduleAutoAdvance(expectedUid) {
-      clearAutoAdvanceTimer();
-      const delayMs = Number(state.autoAdvanceDelay) || 1200;
-      const cd = document.getElementById("autoNavCountdown");
-      const start = Date.now();
-      if (cd) {
-        cd.textContent = `정답! ${(delayMs / 1000).toFixed(1)}초 후 다음 문항으로 이동...`;
-      }
-      autoAdvanceInterval = setInterval(() => {
-        const rem = Math.max(0, (delayMs - (Date.now() - start)) / 1000);
-        if (cd) cd.textContent = `정답! ${rem.toFixed(1)}초 후 다음 문항으로 이동...`;
-      }, 100);
-
-      autoAdvanceTimer = setTimeout(() => {
-        clearAutoAdvanceTimer();
-        const cur = getCurrentCard();
-        if (!cur || cur.uid !== expectedUid) return;
-        const list = getScopedCards();
-        if (list.length <= 1) {
-          checkFullSweepCompletion();
-          return;
-        }
-        const idx = list.findIndex((c) => c.uid === cur.uid);
-        if (idx === list.length - 1) {
-          checkFullSweepCompletion();
-          toast("현재 범위의 마지막 문항까지 완료했습니다!");
-          return;
-        }
-        moveCard(1);
-      }, delayMs);
     }
 
     function showExplanation(card, userInput, mode) {
@@ -5492,21 +5377,22 @@
       const normRef = normalizePron(card.pron);
 
       refLine.textContent = `기준 발음: ${card.pron || "(발음 표기 없음)"}`;
-      userLine.textContent = `내 입력: ${userInput.trim() ? userInput.trim() : "(미입력)"}`;
+      userLine.innerHTML = `내 입력: ${userInput.trim() ? highlightPronDiff(card.pron, userInput) : "(미입력)"}`;
 
-      clearAutoAdvanceTimer();
       if (mode === "reveal") {
         banner.className = "verdict-banner revealed";
         titleEl.textContent = "정답 및 상세 해설을 확인하세요";
       } else if (normRef && normUser && normUser === normRef) {
-        banner.className = "verdict-banner match";
-        titleEl.textContent = "발음이 일치합니다! (정답 처리됨)";
-        setCardStatus(card.uid, "correct", userInput, { triggerAutoAdvance: true });
-      } else {
+        setCardStatus(card.uid, "correct", userInput);
+        toast("정답! 다음 문항으로 이동합니다.");
+        setTimeout(() => moveCard(1), 250);
+        return;
+     } else {
         banner.className = "verdict-banner mismatch";
         titleEl.textContent = "발음 차이가 있습니다 — 아래 해설과 자가 채점을 확인하세요";
         setCardStatus(card.uid, "wrong", userInput);
       }
+      
 
       document.getElementById("expGrammarMeaning").textContent =
         `문형: ${card.pattern}\n핵심 뜻: ${card.meaning}`;
@@ -5569,11 +5455,43 @@
       showExplanation(card, userInput, mode);
     }
 
+    function startWrongReviewMode() {
+      const wrongList = ALL_CARDS.filter((c) => state.records[c.uid]?.status === "wrong");
+      if (!wrongList.length) {
+        toast("오답 복습 대상 문항이 없습니다!");
+        return;
+      }
+      state.scope = "wrong";
+      document.getElementById("scopeSelect").value = "wrong";
+      state.currentUid = wrongList[0].uid;
+      renderCard();
+      document.getElementById("pronInput").focus();
+      toast(`오답 총 복습 시작! (${wrongList.length}문항 · 입력창 자동 초기화)`);
+    }
+
     function moveCard(delta) {
       const list = getScopedCards();
-      if (!list.length) return;
+      if (!list.length) {
+        if (state.scope === "wrong") {
+          toast("모든 오답 복습을 완료했습니다! 전체 문항으로 돌아갑니다.");
+          state.scope = "all";
+          document.getElementById("scopeSelect").value = "all";
+          state.currentUid = ALL_CARDS[0]?.uid || "";
+          renderCard();
+        }
+        return;
+      }
       const cur = getCurrentCard();
       const idx = cur ? list.findIndex((c) => c.uid === cur.uid) : 0;
+
+      // 전체/범위 모드에서 마지막 문항을 마쳤고 미학습 문항이 0개이며 오답이 남아있을 때 오답 총 복습으로 안내
+      const unsolvedCount = ALL_CARDS.filter((c) => !state.records[c.uid]?.status).length;
+      const wrongCount = ALL_CARDS.filter((c) => state.records[c.uid]?.status === "wrong").length;
+      if (delta > 0 && idx === list.length - 1 && state.scope !== "wrong" && unsolvedCount === 0 && wrongCount > 0) {
+        startWrongReviewMode();
+        return;
+      }
+
       const next = list[(idx + delta + list.length) % list.length];
       state.currentUid = next.uid;
       renderCard();
@@ -5593,6 +5511,10 @@
       window.speechSynthesis.speak(u);
     }
 
+    document.getElementById("wrongStatCard").addEventListener("click", () => {
+      startWrongReviewMode();
+    });
+
     document.getElementById("themeBtn").addEventListener("click", () => {
       state.theme = state.theme === "dark" ? "light" : "dark";
       applyTheme();
@@ -5603,8 +5525,7 @@
       const dataStr = JSON.stringify({
         app: "jlpt-n3-solo-pron-study",
         exportedAt: new Date().toISOString(),
-        records: state.records,
-        wrongHistory: state.wrongHistory
+        records: state.records
       }, null, 2);
       const blob = new Blob([dataStr], { type: "application/json" });
       const url = URL.createObjectURL(blob);
@@ -5625,9 +5546,6 @@
           const parsed = JSON.parse(String(reader.result || "{}"));
           if (parsed && parsed.records && typeof parsed.records === "object") {
             state.records = parsed.records;
-            if (parsed.wrongHistory && typeof parsed.wrongHistory === "object") {
-              state.wrongHistory = parsed.wrongHistory;
-            }
             saveState();
             renderCard();
             toast("학습 기록을 가져왔습니다.");
@@ -5643,46 +5561,10 @@
     });
 
     document.getElementById("resetBtn").addEventListener("click", () => {
-      clearAutoAdvanceTimer();
       state.records = {};
-      state.wrongHistory = {};
-      state.sweepCompleted = false;
       saveState();
       renderCard();
-      toast("모든 학습 기록과 오답 이력을 초기화했습니다.");
-    });
-
-    document.getElementById("autoAdvanceToggle").addEventListener("change", (e) => {
-      state.autoAdvance = e.target.checked;
-      if (!state.autoAdvance) clearAutoAdvanceTimer();
-      saveState();
-      toast(state.autoAdvance ? "정답 시 다음 문항 자동 이동이 켜졌습니다." : "자동 이동을 껐습니다.");
-    });
-
-    document.getElementById("autoAdvanceDelay").addEventListener("change", (e) => {
-      state.autoAdvanceDelay = Number(e.target.value) || 1200;
-      saveState();
-    });
-
-    function activateHistoryWrongReview() {
-      clearAutoAdvanceTimer();
-      const histCards = getHistoryWrongCards();
-      if (!histCards.length) {
-        toast("누적된 오답 이력이 없습니다.");
-        return;
-      }
-      state.scope = "history_wrong";
-      state.currentUid = histCards[0].uid;
-      document.getElementById("fullSweepCompletionBox").classList.add("hidden");
-      saveState();
-      renderCard();
-      toast(`오답 이력 총복습 모드(${histCards.length}문항)를 시작합니다.`);
-    }
-
-    document.getElementById("historyReviewBtn").addEventListener("click", activateHistoryWrongReview);
-    document.getElementById("startHistoryReviewBtn").addEventListener("click", activateHistoryWrongReview);
-    document.getElementById("dismissSweepBtn").addEventListener("click", () => {
-      document.getElementById("fullSweepCompletionBox").classList.add("hidden");
+      toast("모든 학습 기록과 오답노트를 초기화했습니다.");
     });
 
     document.getElementById("scopeSelect").addEventListener("change", (e) => {
@@ -5735,8 +5617,9 @@
     document.getElementById("markCorrectBtn").addEventListener("click", () => {
       const card = getCurrentCard();
       if (!card) return;
-      setCardStatus(card.uid, "correct", document.getElementById("pronInput").value, { triggerAutoAdvance: true });
-      toast("정답으로 처리했습니다.");
+      setCardStatus(card.uid, "correct", document.getElementById("pronInput").value);
+      toast("정답으로 처리하고 다음 문항으로 이동합니다.");
+      moveCard(1);
     });
 
     document.getElementById("markWrongBtn").addEventListener("click", () => {
@@ -5784,9 +5667,9 @@
       }
     });
 
+    document.getElementById("scopeSelect").value = state.scope;
     applyTheme();
     renderCard();
-    checkFullSweepCompletion();
   </script>
 </body>
 </html>
